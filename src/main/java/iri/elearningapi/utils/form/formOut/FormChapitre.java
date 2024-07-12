@@ -1,14 +1,19 @@
 package iri.elearningapi.utils.form.formOut;
 
+import iri.elearningapi.utils.elearningData.Etat;
+
 public class FormChapitre {
-	private int		idChapitre		= 0;
-	private int		idModule		= 0;
-	private String	titre			= "";
-	private String	titreEn			= "";
-	private boolean	firstTime		= true;
-	private int		totalQcm		= 0;
-	private int		totalQcmValide	= 0;
-	private String	image			= "";
+	private int idChapitre = 0;
+	private int idModule = 0;
+	private int ordre = 0;
+	private String etat = Etat.ACTIF.name();
+	private String titre = "";
+	private String titreEn = "";
+	private boolean firstTime = true;
+	private int totalQcm = 0;
+	private int totalQcmValide = 0;
+	private String imageURL = "";
+	private String titreModule = "";
 
 	public int getIdChapitre() {
 		return idChapitre;
@@ -58,20 +63,45 @@ public class FormChapitre {
 		this.totalQcmValide = totalQcmValide;
 	}
 
-	public String getImage() {
-		return image;
-	}
-
-	public void setImage(String image) {
-		this.image = image;
-	}
-
+	
 	public boolean isFirstTime() {
 		return firstTime;
 	}
 
 	public void setFirstTime(boolean firstTime) {
-		this.firstTime =firstTime;
+		this.firstTime = firstTime;
+	}
+
+	public String getTitreModule() {
+		return titreModule;
+	}
+
+	public void setTitreModule(String titreModule) {
+		this.titreModule = titreModule;
+	}
+
+	public String getImageURL() {
+		return imageURL;
+	}
+
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
+	}
+
+	public String getEtat() {
+		return etat;
+	}
+
+	public void setEtat(String etat) {
+		this.etat = etat;
+	}
+
+	public int getOrdre() {
+		return ordre;
+	}
+
+	public void setOrdre(int ordre) {
+		this.ordre = ordre;
 	}
 
 }

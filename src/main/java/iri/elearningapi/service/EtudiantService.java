@@ -22,12 +22,16 @@ import iri.elearningapi.model.courModel.Module;
 import iri.elearningapi.model.courModel.Proposition;
 import iri.elearningapi.model.courModel.Qcm;
 import iri.elearningapi.model.userModel.Etudiant;
+import iri.elearningapi.model.userModel.GammeEtudiant;
+import iri.elearningapi.repository.RegionRepository;
 import iri.elearningapi.repository.courRepository.ChapitreRepository;
 import iri.elearningapi.repository.courRepository.EtudiantChapitreRepository;
 import iri.elearningapi.repository.courRepository.EtudiantModuleRepository;
 import iri.elearningapi.repository.courRepository.ModuleRepository;
 import iri.elearningapi.repository.userRepository.EtudiantRepository;
+import iri.elearningapi.repository.userRepository.GammeEtudiantRepository;
 import iri.elearningapi.repository.userRepository.ProfesseurRepository;
+import iri.elearningapi.utils.elearningData.Code;
 import iri.elearningapi.utils.elearningData.Profil;
 import iri.elearningapi.utils.elearningFunction.Cryptage;
 import iri.elearningapi.utils.elearningFunction.Methode;
@@ -56,9 +60,15 @@ public class EtudiantService {
 
 	@Autowired
 	private ChapitreRepository chapitreRepository;
-	
+
 	@Autowired
 	private ProfesseurRepository professeurRepository;
+
+	@Autowired
+	private GammeEtudiantRepository gammeEtudiantRepository;
+
+	@Autowired
+	private RegionRepository regionRepository;
 
 	@Autowired
 	private SenderMail senderMail;
@@ -66,6 +76,13 @@ public class EtudiantService {
 	private static final Random RANDOM = new Random();
 
 	public UserElearning enregistrementEtudiant(Etudiant etudiant) {
+
+		if (etudiant.getGammeEtudiant() != null) {
+			System.out.println("Gamme Etudiant Present == " + etudiant.getGammeEtudiant().getNom());
+		} else {
+			System.out.println("La gamme de l'etudiant n'est pas defini");
+		}
+
 		controlEtudiant(etudiant, true);
 
 		etudiant.setMatricule(generateUniqueMatricule());
@@ -73,7 +90,6 @@ public class EtudiantService {
 		etudiant.setNom(Methode.upperCaseFirst(etudiant.getNom()));
 		etudiant.setPrenom(Methode.upperCaseFirst(etudiant.getPrenom()));
 		etudiant.setLieuNaissance(Methode.upperCaseFirst(etudiant.getLieuNaissance()));
-		etudiant.setRegion(Methode.upperCaseFirst(etudiant.getRegion()));
 		etudiant.setProfession(Methode.upperCaseFirst(etudiant.getProfession()));
 		etudiant.setNomEntreprise(Methode.upperCaseFirst(etudiant.getNomEntreprise()));
 
@@ -114,7 +130,7 @@ public class EtudiantService {
 			user.setNomEntreprise(etudiant.getNomEntreprise());
 			user.setPassword(etudiant.getPassword());
 			updateLastConnexion(etudiant.getId());
-			//System.out.println("== go N2 ==");
+			// System.out.println("== go N2 ==");
 			return user;
 		}
 		return null;
@@ -126,60 +142,72 @@ public class EtudiantService {
 			Etudiant etudiant = etudiantRepository.findById(idEtudiant).get();
 			etudiant.setLastConnexion(new Date());
 			etudiantRepository.save(etudiant);
-			//System.out.println("== go N111 ==");
+			// System.out.println("== go N111 ==");
 		}
 	}
 
 	public void controlEtudiant(Etudiant etudiant, boolean isNew) {
+
+		if (etudiant.getGammeEtudiant() == null
+				|| !gammeEtudiantRepository.existsById(etudiant.getGammeEtudiant().getId())) {
+			throw new ElearningException(new ErrorAPI("Vous n'avez pas defini votre profil de formation", 0));
+		}
+
 		if (etudiant.getNom() == null || etudiant.getNom().trim().length() < 3)
 			throw new ElearningException(new ErrorAPI(
-					"Le nom du canditat ne doit pas être vide, ou contenir moins de trois(03) caractères", 0));
+					"Le nom du canditat ne doit pas être vide, ou contenir moins de trois(03) caractères", 1));
 
 		if (etudiant.getNom().trim().length() > 50)
 			throw new ElearningException(
-					new ErrorAPI("Le nom du canditat est trop long...! Il ne doit pas dépasser 50 caractères", 0));
+					new ErrorAPI("Le nom du canditat est trop long...! Il ne doit pas dépasser 50 caractères", 1));
 
-		if (etudiant.getPrenom() == null && etudiant.getPrenom().trim().length() > 50)
+		if (etudiant.getPrenom() != null && etudiant.getPrenom().trim().length() > 50)
 			throw new ElearningException(
-					new ErrorAPI("Le prenom du canditat est trop long...! Il ne doit pas dépasser 50 caractères", 0));
+					new ErrorAPI("Le prenom du canditat est trop long...! Il ne doit pas dépasser 50 caractères", 1));
 
-		if (etudiant.getDateNaissance() == null)
-			throw new ElearningException(new ErrorAPI("La date de naissance du canditat est obligatoire", 0));
+		if (!Code.C004.name().equals(etudiant.getGammeEtudiant().getCode())) {
+			System.out.println("voici le code gamme de l'entrepreueneur == "+etudiant.getGammeEtudiant().getCode());
+			if (etudiant.getDateNaissance() == null)
+				throw new ElearningException(new ErrorAPI("La date de naissance du canditat est obligatoire", 1));
+
+			if (etudiant.getLieuNaissance() == null || etudiant.getLieuNaissance().trim().isEmpty())
+				throw new ElearningException(new ErrorAPI("Le lieu de naissance du canditat est obligatoire", 1));
+		}
 
 		if (etudiant.getEmail() == null || etudiant.getEmail().trim().isEmpty())
-			throw new ElearningException(new ErrorAPI("L'email du canditat est obligatoire", 0));
+			throw new ElearningException(new ErrorAPI("L'email du canditat est obligatoire", 1));
 
 		if (!isValidEmail(etudiant.getEmail()))
-			throw new ElearningException(new ErrorAPI("L'email entré est invalide", 0));
+			throw new ElearningException(new ErrorAPI("L'email entré est invalide", 1));
+		
+		if (!Code.C004.name().equals(etudiant.getGammeEtudiant().getCode())) {
+			if (etudiant.getProfession() == null || etudiant.getProfession().trim().isEmpty())
+				throw new ElearningException(new ErrorAPI("La profession du canditat est obligatoire", 2));
+		}
 
-		if (etudiant.getProfession() == null || etudiant.getProfession().trim().isEmpty())
-			throw new ElearningException(new ErrorAPI("La profession du canditat est obligatoire", 1));
-
-		if (etudiant.getRegion() == null || etudiant.getRegion().trim().isEmpty())
-			throw new ElearningException(new ErrorAPI("La région du canditat est obligatoire", 1));
-
-		if (etudiant.getLieuNaissance() == null || etudiant.getLieuNaissance().trim().isEmpty())
-			throw new ElearningException(new ErrorAPI("Le lieu de naissance du canditat est obligatoire", 0));
+		if (etudiant.getRegion() == null || !regionRepository.existsById(etudiant.getRegion().getId())) {
+			throw new ElearningException(new ErrorAPI("vous devez definir votre region de residence", 2));
+		}
 
 		if (isNew) {
 			// Si c'est un nouvel étudiant, vérifiez si l'email ou le numéro de téléphone
 			// existe déjà
 			if (etudiantRepository.findByEmail(etudiant.getEmail()) != null) {
-				throw new ElearningException(new ErrorAPI("Un canditat avec cet email existe déjà", 0));
+				throw new ElearningException(new ErrorAPI("Un canditat avec cet email existe déjà", 1));
 			}
 			if (etudiantRepository.findByTelephone(etudiant.getTelephone()) != null) {
-				throw new ElearningException(new ErrorAPI("Un canditat avec ce numéro de téléphone existe déjà", 0));
+				throw new ElearningException(new ErrorAPI("Un canditat avec ce numéro de téléphone existe déjà", 1));
 			}
 
 			if (etudiant.getPassword() == null || etudiant.getPassword().trim().isEmpty()) {
-				throw new ElearningException(new ErrorAPI("Le mot de passe est obligatoire", 2));
+				throw new ElearningException(new ErrorAPI("Le mot de passe est obligatoire", 3));
 			}
 			if (etudiant.getPassword().length() < 8) {
-				throw new ElearningException(new ErrorAPI("Le mot de passe doit contenir au moins 8 caractères", 2));
+				throw new ElearningException(new ErrorAPI("Le mot de passe doit contenir au moins 8 caractères", 3));
 			}
 			if (!etudiant.getPassword().equals(etudiant.getConfirmPassword())) {
 				throw new ElearningException(
-						new ErrorAPI("Le mot de passe et la confirmation du mot de passe ne correspondent pas", 2));
+						new ErrorAPI("Le mot de passe et la confirmation du mot de passe ne correspondent pas", 3));
 			}
 
 		} else {
@@ -196,14 +224,15 @@ public class EtudiantService {
 						new ErrorAPI("Un autre canditat avec ce numéro de téléphone existe déjà", 0));
 			}
 		}
-		
-		if (etudiant.getTelephone()!=null && professeurRepository.existsByTelephone(etudiant.getTelephone())) {
-			throw new ElearningException(new ErrorAPI("Le numero de téléphone entré est deja utiliser par un compte Professeur",0));
+
+		if (etudiant.getTelephone() != null && professeurRepository.existsByTelephone(etudiant.getTelephone())) {
+			throw new ElearningException(
+					new ErrorAPI("Le numero de téléphone entré est deja utiliser par un compte Professeur", 0));
 		}
-		
-		
-		if (etudiant.getEmail()!=null && professeurRepository.existsByEmail(etudiant.getEmail())) {
-			throw new ElearningException(new ErrorAPI("L'adresse mail entrée est deja utiliser par un compte Professeur",0));
+
+		if (etudiant.getEmail() != null && professeurRepository.existsByEmail(etudiant.getEmail())) {
+			throw new ElearningException(
+					new ErrorAPI("L'adresse mail entrée est deja utiliser par un compte Professeur", 0));
 		}
 
 	}
@@ -236,26 +265,42 @@ public class EtudiantService {
 			}
 
 			for (Module module01 : moduleRepository.findAll()) {
-				if (module01.getDateDeblocage() == null || module01.getDateDeblocage().before(new Date())) {
-					userDashboard.setModuleAccessible(userDashboard.getModuleAccessible() + 1);
-					module01.setIsAccessible(true);
-				}
-
-				module01.setFistTime(false);
-				for (EtudiantModule etudiantModule : etudiant.getEtudiantModules()) {
-					if (etudiantModule.getModule().getIdModule() == module01.getIdModule()) {
-						module01.setFistTime(true);
+				if (etudiant.getGammeEtudiant() != null && etudiant.getGammeEtudiant().getGammeEtudiantModules()
+						.stream().anyMatch(e -> (e.getModule() != null && e.getModule().equals(module01)))) {
+					if (module01.getDateDeblocage() == null || module01.getDateDeblocage().before(new Date())) {
+						userDashboard.setModuleAccessible(userDashboard.getModuleAccessible() + 1);
+						module01.setIsAccessible(true);
 					}
-				}
-				userDashboard.addModule(module01);
-			}
-			
-			
-			userDashboard.setModuleTotal((int) moduleRepository.count());
-			userDashboard.setChapitreTotal((int)chapitreRepository.count());
-			userDashboard.setQcmTotal((int) chapitreRepository.findAllByOrderByTitreAsc().stream().mapToInt(item->item.getQcms().size()).sum());
 
-		}     
+					module01.setFistTime(false);
+					for (EtudiantModule etudiantModule : etudiant.getEtudiantModules()) {
+						if (etudiantModule.getModule().getIdModule() == module01.getIdModule()) {
+							module01.setFistTime(true);
+						}
+					}
+					userDashboard.addModule(module01);
+
+					if (module01.getChapitres() != null) {
+						userDashboard
+								.setChapitreTotal(userDashboard.getChapitreTotal() + module01.getChapitres().size());
+						userDashboard.setQcmTotal(userDashboard.getQcmTotal()
+								+ module01.getChapitres().stream().mapToInt(e -> e.getQcms().size()).sum());
+					}
+
+				}
+			}
+
+			userDashboard.setModuleTotal(userDashboard.getModules() != null ? userDashboard.getModules().size() : 0);
+
+			// userDashboard.setModuleTotal(userDashboard.getModules() != null ?
+			// userDashboard.getModules().size() : 0);
+			// userDashboard.setChapitreTotal((int) chapitreRepository.count());
+			/*
+			 * userDashboard.setQcmTotal((int)
+			 * chapitreRepository.findAllByOrderByTitreAsc().stream() .mapToInt(item ->
+			 * item.getQcms().size()).sum());
+			 */
+		}
 
 		return userDashboard;
 	}
@@ -266,6 +311,13 @@ public class EtudiantService {
 		if (etudiantRepository.existsById(idEtudiant) && moduleRepository.existsById(idModule)) {
 
 			Module module = moduleRepository.findById(idModule).get();
+			Etudiant etudiant = etudiantRepository.findById(idEtudiant).get();
+
+			if (module.getGammeEtudiantModules() == null || !module.getGammeEtudiantModules().stream().anyMatch(
+					e -> (e.getGammeEtudiant() != null && e.getGammeEtudiant().equals(etudiant.getGammeEtudiant())))) {
+				System.out.println("Acces au cours du module refuser");
+				throw new ElearningException(new ErrorAPI("Vous n'avaez pas acces a ce module"));
+			}
 
 			Boolean isFirstOpen = true;
 
@@ -289,7 +341,10 @@ public class EtudiantService {
 				formChapitre.setIdChapitre(chapitre.getIdChapitre());
 				formChapitre.setIdModule(idModule);
 				formChapitre.setTitre(chapitre.getTitre());
-				formChapitre.setImage(chapitre.getImage());
+				formChapitre.setImageURL(chapitre.getImage());
+				formChapitre.setEtat(chapitre.getEtat());
+				formChapitre.setTitreModule(module.getTitre());
+				formChapitre.setOrdre(chapitre.getOrdre());
 
 				if (chapitre.getChapitreEns() != null && !chapitre.getChapitreEns().isEmpty()) {
 					formChapitre.setTitreEn(chapitre.getChapitreEns().get(0).getTitre());
@@ -410,7 +465,7 @@ public class EtudiantService {
 	}
 
 	public Page<Etudiant> getListEtudiants(String filter, int pageNumber) {
-		
+
 		Pageable pageable = PageRequest.of(pageNumber, 50);
 
 		Page<Etudiant> pageEtudiants;

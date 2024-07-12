@@ -9,5 +9,10 @@ import iri.elearningapi.model.courModel.Module;
 
 @Repository
 public interface ModuleRepository extends CrudRepository<Module, Integer> {
-	List<Module> findAllByOrderByTitreAsc();	
+	List<Module> findAllByOrderByTitreAsc();
+	
+	List<Module> findAllByTitreContainingOrderByTitreAsc(String titreContainString);
+	
+	boolean existsByTitre(String Titre);
+	Module findByTitre(String titre);
 }

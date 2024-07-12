@@ -1,8 +1,9 @@
 package iri.elearningapi.utils.form.formInt;
 
 public class FormLink {
-	private int		idModule	= 0;
-	private boolean	isLinked	= false;
+	private int idModule = 0;
+	private int idElement = 0;// pour tout les beans qui on un identifient de type Integer
+	private boolean isLinked = false;
 
 	public int getIdModule() {
 		return idModule;
@@ -19,18 +20,25 @@ public class FormLink {
 	public void setLinked(boolean isLinked) {
 		this.isLinked = isLinked;
 	}
-	
+
 	public boolean getLinked() {
 		return isLinked;
 	}
-	
-	
+
 	public void setIsLinked(boolean isLinked) {
 		this.isLinked = isLinked;
 	}
-	
+
 	public boolean getIsLinked() {
 		return isLinked;
+	}
+
+	public int getIdElement() {
+		return idElement;
+	}
+
+	public void setIdElement(int idElement) {
+		this.idElement = idElement;
 	}
 
 }

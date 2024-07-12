@@ -1,5 +1,7 @@
 package iri.elearningapi.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -64,8 +66,21 @@ public class MediaController {
 		return mediaService.getAllArticleRubrique(idRubrique, pageNumber);
 	}
 	
+	@GetMapping("/public/media/listarticlerubrique/{idRubrique}/{pageNumber}")
+	public Page<Article> getAllArticleRubriqueOnlyPostedArticle(@PathVariable("idRubrique") int idRubrique, @PathVariable("pageNumber") int pageNumber){
+		return mediaService.getAllArticleRubrique(idRubrique, pageNumber,true);
+	}
+	
 	@GetMapping("/public/media/article/{lein}")
-	public Article getArticleByLien(@PathVariable("lein") String lein) {
+	public Article getArticleByLien(@PathVariable("lein") String lein,HttpServletRequest request) {
+		String forwardedFor = request.getHeader("X-Forwarded-For");
+		System.out.println("ridicule || "+request.getHeader("User-Agent"));
+	    if (forwardedFor != null) {
+	        String[] ipAddresses = forwardedFor.split(", ");
+	        // Extraire l'adresse IP du serveur proxy final (généralement la dernière adresse)
+	        String userIPAddress = ipAddresses[ipAddresses.length - 1];
+	        System.out.println("Adresse IP de l'utilisateur : " + userIPAddress);
+	    }
 		return mediaService.getArticleByLien(lein);
 	}
 	

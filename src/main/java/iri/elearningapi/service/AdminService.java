@@ -6,12 +6,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import iri.elearningapi.model.userModel.Admin;
 import iri.elearningapi.model.courModel.Chapitre;
 import iri.elearningapi.model.courModel.Module;
+import iri.elearningapi.model.userModel.Admin;
 import iri.elearningapi.repository.courRepository.ChapitreRepository;
 import iri.elearningapi.repository.courRepository.EtudiantChapitreRepository;
-import iri.elearningapi.repository.courRepository.EtudiantModuleRepository;
 import iri.elearningapi.repository.courRepository.ModuleRepository;
 import iri.elearningapi.repository.courRepository.QuestionCourRepository;
 import iri.elearningapi.repository.userRepository.AdminRepository;
@@ -36,8 +35,8 @@ public class AdminService {
 	@Autowired
 	private QuestionCourRepository questionCourRepository;
 	
-	@Autowired
-	private EtudiantModuleRepository etudiantModuleRepository;
+	//@Autowired
+	//private EtudiantModuleRepository etudiantModuleRepository;
 
 	@Autowired
 	private EtudiantChapitreRepository etudiantChapitreRepository;

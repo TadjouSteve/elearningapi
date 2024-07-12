@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
@@ -17,6 +19,7 @@ import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import iri.elearningapi.model.Region;
 import iri.elearningapi.model.courModel.EtudiantChapitre;
 import iri.elearningapi.model.courModel.EtudiantModule;
 
@@ -82,7 +85,7 @@ public class Etudiant implements Serializable {
  
 	private String prenom;
 
-	private String region;
+	//private String region;
 
 	@Column(unique = true)
 	private String telephone;
@@ -104,6 +107,16 @@ public class Etudiant implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "etudiant")
 	private List<EtudiantModule> etudiantModules;
+	
+	@ManyToOne
+	@JoinColumn(name="id_Gamme_Etudiant")
+	private GammeEtudiant gammeEtudiant;
+
+	//bi-directional many-to-one association to Region
+	@ManyToOne
+	@JoinColumn(name="id_Region")
+	private Region region;
+
 
 	public Etudiant() {
 	}
@@ -188,13 +201,7 @@ public class Etudiant implements Serializable {
 		this.prenom = prenom;
 	}
 
-	public String getRegion() {
-		return this.region;
-	}
-
-	public void setRegion(String region) {
-		this.region = region;
-	}
+	
 
 	public String getTelephone() {
 		return this.telephone;
@@ -286,6 +293,22 @@ public class Etudiant implements Serializable {
 
 	public void setStatut(int statut) {
 		this.statut = statut;
+	}
+
+	public Region getRegion() {
+		return region;
+	}
+
+	public void setRegion(Region region) {
+		this.region = region;
+	}
+
+	public GammeEtudiant getGammeEtudiant() {
+		return gammeEtudiant;
+	}
+
+	public void setGammeEtudiant(GammeEtudiant gammeEtudiant) {
+		this.gammeEtudiant = gammeEtudiant;
 	}
 
 }

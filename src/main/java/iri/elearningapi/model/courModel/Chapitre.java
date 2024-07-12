@@ -67,9 +67,14 @@ public class Chapitre implements Serializable {
 	private String preanbule;
 
 	private int qcm;
+	
+	private int ordre;
 
 	@Lob
 	private String titre;
+	
+	private String etat;
+
 
 	@Lob
 	private String video;
@@ -302,6 +307,22 @@ public class Chapitre implements Serializable {
 
 	public void setTexte(String texte) {
 		this.texte = texte;
+	}
+
+	public String getEtat() {
+		return etat;
+	}
+
+	public void setEtat(String etat) {
+		this.etat = etat;
+	}
+
+	public int getOrdre() {
+		return ordre;
+	}
+
+	public void setOrdre(int ordre) {
+		this.ordre = ordre;
 	}
 
 

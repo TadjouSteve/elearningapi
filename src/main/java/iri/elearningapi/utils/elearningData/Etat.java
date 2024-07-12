@@ -1,7 +1,7 @@
 package iri.elearningapi.utils.elearningData;
 
 public enum Etat {
-	ACTIF(1), SUPPRIME(0), DELETE(0);
+	ACTIF(1), SUPPRIME(0), DELETE(0),SUSPENDU(-1),INACTIF(-1);
 
 	private final int valeur;
 

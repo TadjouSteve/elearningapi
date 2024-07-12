@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import iri.elearningapi.model.mediaModel.Article;
@@ -26,8 +27,9 @@ public class MediaService {
 	@Autowired
 	ArticleRepository articleRepository;
 
-	public Rubrique createRubrique(Rubrique rubrique) {
-		controlRubrique(rubrique);
+	public Rubrique createOrUpdateRubrique(Rubrique rubrique, boolean isNew) {
+		controlRubrique(rubrique, isNew);
+		rubrique.setNom(rubrique.getNom().trim());
 		rubrique.setDate(new Date());
 		rubrique.setStatut(Statut.OUVERT.name());
 		rubrique.setEtat(Etat.ACTIF.getValeur());
@@ -35,18 +37,23 @@ public class MediaService {
 		return rubrique;
 	}
 
-	public Article createArticle(Article article, int idRubrique) {
+	public Article createOrUpdateArticle(Article article, int idRubrique, boolean isNew) {
 		if (rubriqueRepository.existsById(idRubrique)) {
 			controlArticle(article);
-			article.setDate(new Date());
+			if (isNew) {
+				article.setDate(new Date());
+				article.setStatut(Statut.EN_ATTENTE.name());
+				article.setEtat(Etat.ACTIF.getValeur());
+				String lien = "";
+				do {
+					lien = Methode.generateRandomString().toLowerCase();
+				} while (articleRepository.existsByLien(lien));
+				article.setLien(lien);
+			} else {
+				article.setDateModification(new Date());
+			}
+			
 			article.setRubrique(rubriqueRepository.findById(idRubrique).get());
-			article.setStatut(Statut.EN_ATTENTE.name());
-			article.setEtat(Etat.ACTIF.getValeur());
-			String lien = "";
-			do {
-				lien = Methode.generateRandomString();
-			} while (articleRepository.existsByLien(lien));
-			article.setLien(lien);
 			article = articleRepository.save(article);
 			return article;
 		} else {
@@ -80,10 +87,19 @@ public class MediaService {
 			if (!Statut.PUBLIER.name().equals(article.getStatut())) {
 				throw new ElearningException(new ErrorAPI("Cet article n'est pas accessible au public"));
 			}
-
+			incrementNombreVueArticle(article.getId());
 			return article;
 		} else {
 			throw new ElearningException(new ErrorAPI("Aucun article trouver pour ce lien....!"));
+		}
+	}
+
+	@Async
+	private void incrementNombreVueArticle(int idArticle) {
+		if (articleRepository.existsById(idArticle)) {
+			Article article = articleRepository.findById(idArticle).get();
+			article.setEtat(article.getEtat() + 1);
+			articleRepository.save(article);
 		}
 	}
 
@@ -97,7 +113,7 @@ public class MediaService {
 		} else {
 			pageRubrique = rubriqueRepository.findAllByOrderByNomAsc(pageable);
 		}
-		System.out.println("liste obtenue == " + pageRubrique.getNumber());
+		// System.out.println("liste obtenue == " + pageRubrique.getNumber());
 		return pageRubrique;
 	}
 
@@ -108,15 +124,15 @@ public class MediaService {
 		Page<Article> pageArticle;
 
 		if (filter != null) {
-			pageArticle = articleRepository.findByTitreOrderByDateAsc(filter, pageable);
+			pageArticle = articleRepository.findByTitreOrderByDateDesc(filter, pageable);
 		} else {
-			pageArticle = articleRepository.findAllByOrderByDateAsc(pageable);
+			pageArticle = articleRepository.findAllByOrderByDateDesc(pageable);
 		}
 
 		return pageArticle;
 	}
 
-	private void controlRubrique(Rubrique rubrique) {
+	private void controlRubrique(Rubrique rubrique, boolean isNew) {
 		if (rubrique.getNom() == null || rubrique.getNom().length() < 5) {
 			throw new ElearningException(new ErrorAPI(
 					"Le nom de la  rubrique ne doit pas être vide, ou contenir moins de trois(03) caractères", 0));
@@ -124,7 +140,15 @@ public class MediaService {
 
 		if (rubrique.getNom() != null && rubrique.getNom().length() > 30) {
 			throw new ElearningException(
-					new ErrorAPI("Le nom de la rubrique est trop long...! Il ne doit pas dépasser 50 caractères", 0));
+					new ErrorAPI("Le nom de la rubrique est trop long...! Il ne doit pas dépasser 30 caractères", 0));
+		}
+
+		if (isNew && rubriqueRepository.existsByNom(rubrique.getNom())) {
+			throw new ElearningException(new ErrorAPI("Une autre rubrique existe deja avec ce Nom...!"));
+		}
+
+		if (!isNew && rubriqueRepository.existsByNom(rubrique.getNom().trim()) && rubriqueRepository.findByNom(rubrique.getNom().trim()).getId() != rubrique.getId()) {
+			throw new ElearningException(new ErrorAPI("Une autre rubrique existe deja avec ce Nom...!"));
 		}
 	}
 
@@ -134,9 +158,9 @@ public class MediaService {
 					"Le Titre de l'article ne doit pas être vide, ou contenir moins de dix(10) caractères", 0));
 		}
 
-		if (article.getTitre() != null && article.getTitre().length() > 150) {
+		if (article.getTitre() != null && article.getTitre().length() > 200) {
 			throw new ElearningException(
-					new ErrorAPI("Le Titre de l'article est trop long...! Il ne doit pas dépasser 150 caractères", 0));
+					new ErrorAPI("Le Titre de l'article est trop long...! Il ne doit pas dépasser 200 caractères", 0));
 		}
 
 		if (article.getTexte() == null || article.getTexte().length() < 30) {
@@ -144,9 +168,9 @@ public class MediaService {
 					"Le Texte de l'article ne doit pas être vide, ou contenir moins de trente(30) caractères", 0));
 		}
 
-		if (article.getAuteur() == null || article.getAuteur().length() < 10) {
+		if (article.getAuteur() == null || article.getAuteur().length() < 5) {
 			throw new ElearningException(new ErrorAPI(
-					"Le Nom de l'auteur ne doit pas être vide, ou contenir moins de dix(10) caractères", 0));
+					"Le Nom de l'auteur ne doit pas être vide, ou contenir moins de cinq(05) caractères", 0));
 		}
 
 	}
@@ -174,12 +198,23 @@ public class MediaService {
 	}
 
 	public Page<Article> getAllArticleRubrique(int idRubrique, int pageNumber) {
+		return getAllArticleRubrique(idRubrique, pageNumber, false);
+	}
+
+	public Page<Article> getAllArticleRubrique(int idRubrique, int pageNumber, Boolean onlyPosted) {
 		Pageable pageable = PageRequest.of(pageNumber, 50);
 		Page<Article> pageArticle;
 
 		if (rubriqueRepository.existsById(idRubrique)) {
-			pageArticle = articleRepository.findByRubriqueOrderByIdAsc(rubriqueRepository.findById(idRubrique).get(),
-					pageable);
+			if (!onlyPosted) {
+				pageArticle = articleRepository
+						.findByRubriqueOrderByIdDesc(rubriqueRepository.findById(idRubrique).get(), pageable);
+
+			} else {
+				pageArticle = articleRepository.findByRubriqueAndStatutOrderByIdDesc(
+						rubriqueRepository.findById(idRubrique).get(), Statut.PUBLIER.name(), pageable);
+			}
+
 			return pageArticle;
 		} else {
 			throw new ElearningException(new ErrorAPI("La rubrique visée n'existe pas....!"));

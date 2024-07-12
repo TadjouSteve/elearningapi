@@ -9,7 +9,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
@@ -18,10 +20,11 @@ import javax.persistence.TemporalType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import iri.elearningapi.model.Message;
+import iri.elearningapi.model.Region;
 import iri.elearningapi.model.courModel.ProfesseurModule;
 import iri.elearningapi.model.courModel.Reponse;
 import lombok.Data;
- 
+
 /*
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,7 +38,6 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 */
 
-
 /**
  * The persistent class for the professeur database table.
  * 
@@ -43,25 +45,25 @@ import jakarta.persistence.TemporalType;
 
 @Data
 @Entity
-@NamedQuery(name="Professeur.findAll", query="SELECT p FROM Professeur p")
+@NamedQuery(name = "Professeur.findAll", query = "SELECT p FROM Professeur p")
 public class Professeur implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
 	@Lob
 	private String email;
 
 	private String etat;
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "date_inscription")
 	private Date dateInscription;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="last_connexion")
+	@Column(name = "last_connexion")
 	private Date lastConnexion;
 
 	private String matricule;
@@ -81,20 +83,30 @@ public class Professeur implements Serializable {
 	@Lob
 	private String telephone;
 
-	//bi-directional many-to-one association to Message
+	// bi-directional many-to-one association to Message
 	@JsonIgnore
-	@OneToMany(mappedBy="professeur")
+	@OneToMany(mappedBy = "professeur")
 	private List<Message> messages;
 
-	//bi-directional many-to-one association to ProfesseurModule
+	// bi-directional many-to-one association to ProfesseurModule
 	@JsonIgnore
-	@OneToMany(mappedBy="professeur")
+	@OneToMany(mappedBy = "professeur")
 	private List<ProfesseurModule> professeurModules;
 
-	//bi-directional many-to-one association to Reponse
+	// bi-directional many-to-one association to Reponse
 	@JsonIgnore
-	@OneToMany(mappedBy="professeur")
+	@OneToMany(mappedBy = "professeur")
 	private List<Reponse> reponses;
+
+	// bi-directional many-to-one association to GammeEtudiantProfesseur
+	@JsonIgnore
+	@OneToMany(mappedBy = "professeur")
+	private List<GammeEtudiantProfesseur> gammeEtudiantProfesseurs;
+
+	// bi-directional many-to-one association to Region
+	@ManyToOne
+	@JoinColumn(name = "id_Region")
+	private Region region;
 
 	public Professeur() {
 	}
@@ -253,4 +265,33 @@ public class Professeur implements Serializable {
 		this.dateInscription = dateInscription;
 	}
 
+	public Region getRegion() {
+		return this.region;
+	}
+
+	public void setRegion(Region region) {
+		this.region = region;
+	}
+	
+	public List<GammeEtudiantProfesseur> getGammeEtudiantProfesseurs() {
+		return this.gammeEtudiantProfesseurs;
+	}
+
+	public void setGammeEtudiantProfesseurs(List<GammeEtudiantProfesseur> gammeEtudiantProfesseurs) {
+		this.gammeEtudiantProfesseurs = gammeEtudiantProfesseurs;
+	}
+
+	public GammeEtudiantProfesseur addGammeEtudiantProfesseur(GammeEtudiantProfesseur gammeEtudiantProfesseur) {
+		getGammeEtudiantProfesseurs().add(gammeEtudiantProfesseur);
+		gammeEtudiantProfesseur.setProfesseur(this);
+
+		return gammeEtudiantProfesseur;
+	}
+
+	public GammeEtudiantProfesseur removeGammeEtudiantProfesseur(GammeEtudiantProfesseur gammeEtudiantProfesseur) {
+		getGammeEtudiantProfesseurs().remove(gammeEtudiantProfesseur);
+		gammeEtudiantProfesseur.setProfesseur(null);
+
+		return gammeEtudiantProfesseur;
+	}
 }

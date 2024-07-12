@@ -18,22 +18,6 @@ import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-/*
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import jakarta.persistence.Transient;
-*/
-
-
-
 /**
  * The persistent class for the module database table.
  * 
@@ -92,6 +76,13 @@ public class Module implements Serializable {
 	@OneToMany(mappedBy="module")
 	@JsonIgnore
 	private List<QuestionCour> questionCours;
+	
+	
+	//bi-directional many-to-one association to GammeEtudiantModule
+	@JsonIgnore
+	@OneToMany(mappedBy="module")
+	private List<GammeEtudiantModule> gammeEtudiantModules;
+
 	
 	@Transient
 	private Boolean fistTime=false;
@@ -292,6 +283,28 @@ public class Module implements Serializable {
 
 	public void setIsAccessible(Boolean isAccessible) {
 		this.isAccessible = isAccessible;
+	}
+
+	public List<GammeEtudiantModule> getGammeEtudiantModules() {
+		return this.gammeEtudiantModules;
+	}
+
+	public void setGammeEtudiantModules(List<GammeEtudiantModule> gammeEtudiantModules) {
+		this.gammeEtudiantModules = gammeEtudiantModules;
+	}
+
+	public GammeEtudiantModule addGammeEtudiantModule(GammeEtudiantModule gammeEtudiantModule) {
+		getGammeEtudiantModules().add(gammeEtudiantModule);
+		gammeEtudiantModule.setModule(this);
+
+		return gammeEtudiantModule;
+	}
+
+	public GammeEtudiantModule removeGammeEtudiantModule(GammeEtudiantModule gammeEtudiantModule) {
+		getGammeEtudiantModules().remove(gammeEtudiantModule);
+		gammeEtudiantModule.setModule(null);
+
+		return gammeEtudiantModule;
 	}
 
 	

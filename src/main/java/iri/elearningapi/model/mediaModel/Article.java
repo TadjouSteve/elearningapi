@@ -42,8 +42,15 @@ public class Article implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="date_publication")
 	private Date datePublication;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="date_modification")
+	private Date dateModification;
 
 	private int etat;
+	
+	@Column(name="nombre_vue")
+	private int nombreVue;
 
 	@Lob
 	private String image_URL;
@@ -61,6 +68,10 @@ public class Article implements Serializable {
 
 	@Lob
 	private String titre;
+	
+	@Lob
+	@Column(name="sur_titre")
+	private String surTitre;
 
 	@Lob
 	@Column(name="titre_auteur")
@@ -231,6 +242,30 @@ public class Article implements Serializable {
 
 	public void setDatePublication(Date datePublication) {
 		this.datePublication = datePublication;
+	}
+
+	public Date getDateModification() {
+		return dateModification;
+	}
+
+	public void setDateModification(Date dateModification) {
+		this.dateModification = dateModification;
+	}
+
+	public int getNombreVue() {
+		return nombreVue;
+	}
+
+	public void setNombreVue(int nombreVue) {
+		this.nombreVue = nombreVue;
+	}
+
+	public String getSurTitre() {
+		return surTitre;
+	}
+
+	public void setSurTitre(String surTitre) {
+		this.surTitre = surTitre;
 	}
 
 }

@@ -1,5 +1,10 @@
 package iri.elearningapi .utils.elearningFunction;
 
+//import jakarta.mail.MessagingException;
+//import jakarta.mail.internet.MimeMessage;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 //import org.springframework.mail.javamail.JavaMailSender;
@@ -11,10 +16,6 @@ import iri.elearningapi.model.courModel.Chapitre;
 import iri.elearningapi.model.userModel.Etudiant;
 import iri.elearningapi.model.userModel.Professeur;
 import iri.elearningapi.utils.form.formInt.FormQcmForValidation;
-//import jakarta.mail.MessagingException;
-//import jakarta.mail.internet.MimeMessage;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 
 @Service
 public class SenderMail {
@@ -121,7 +122,8 @@ public class SenderMail {
 	private  void sendEmail(String email, String bodyMessage, String subject) {
 		// use mailSender here...
 		// String bodyMessage=getEmailBody();
-		String from = "streengeapp@gmail.com";
+		//String from = "streengeapp@gmail.com";
+		String from="programmeleadership@programmeleadership.net";
 		String to = email.trim();
 
 		MimeMessage message = mailSender.createMimeMessage();
@@ -131,10 +133,14 @@ public class SenderMail {
 			helper.setTo(to);
 			helper.setSubject(subject);
 			helper.setText(bodyMessage, true);
+			helper.setCc("archive@programmeleadership.net");
+			//helper.setText(bodyMessage);
 			mailSender.send(message);
+			//System.out.println("Le mail a ete envoyer");
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			//System.out.println(" ERREUR ERREUR ERREUR echec de l'envoi du mail...!");
 		}
 	}
 }

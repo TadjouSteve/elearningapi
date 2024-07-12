@@ -13,11 +13,11 @@ import iri.elearningapi.model.mediaModel.Rubrique;
 
 @Repository
 public interface ArticleRepository extends CrudRepository<Article, Integer> {
-	List<Article> findAllByOrderByIdAsc();
+	List<Article> findAllByOrderByIdDesc();
 	List<Article> findByTitreOrderByIdAsc(String titre);
-	List<Article> findAllByDateBetweenOrderByDateAsc(Date dateDebut,Date dateFin);
+	List<Article> findAllByDateBetweenOrderByDateDesc(Date dateDebut,Date dateFin);
 	
-	List<Article> findByRubriqueOrderByIdAsc(Rubrique rubrique);
+	List<Article> findByRubriqueOrderByIdDesc(Rubrique rubrique);
 	
 	boolean existsByTitre(String titre);
 	boolean existsByLien(String lien);
@@ -26,12 +26,14 @@ public interface ArticleRepository extends CrudRepository<Article, Integer> {
 	Article findByLien(String lien);
 	
 	
-	Page<Article> findAllByOrderByDateAsc(Pageable pageable);
-	Page<Article> findByTitreOrderByDateAsc(String titre,Pageable pageable);
-	Page<Article> findByRubriqueOrderByIdAsc(Rubrique rubrique,Pageable pageable);
+	Page<Article> findAllByOrderByDateDesc(Pageable pageable);
+	Page<Article> findByTitreOrderByDateDesc(String titre,Pageable pageable);
+	Page<Article> findByRubriqueOrderByIdDesc(Rubrique rubrique,Pageable pageable);
 	
-	Page<Article> findByTitreContainingOrderByDateAsc(String titre,Pageable pageable);
-	Page<Article> findBySousTitreContainingOrTexteContainingOrderByDateAsc(String soustitre,String texte,Pageable pageable);
+	Page<Article> findByRubriqueAndStatutOrderByIdDesc(Rubrique rubrique,String statutFilter,Pageable pageable);
+	
+	Page<Article> findByTitreContainingOrderByDateDesc(String titre,Pageable pageable);
+	Page<Article> findBySousTitreContainingOrTexteContainingOrderByDateDesc(String soustitre,String texte,Pageable pageable);
 	
 	//Page<Article> findAllByOrderByDateAsc(Pageable pageable);
 	Page<Article>findAllByDateBetween(Date dateDebut,Date dateFin,Pageable pageable);
