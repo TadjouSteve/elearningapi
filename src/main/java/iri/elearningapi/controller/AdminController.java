@@ -18,19 +18,24 @@ import org.springframework.web.multipart.MultipartFile;
 
 import iri.elearningapi.model.courModel.Chapitre;
 import iri.elearningapi.model.courModel.Module;
+import iri.elearningapi.model.courModel.Proposition;
+import iri.elearningapi.model.courModel.Qcm;
+import iri.elearningapi.model.courModel.Qro;
 import iri.elearningapi.model.mediaModel.Article;
 import iri.elearningapi.model.mediaModel.Rubrique;
 import iri.elearningapi.model.userModel.Etudiant;
 import iri.elearningapi.model.userModel.Professeur;
 import iri.elearningapi.service.AdminService;
 import iri.elearningapi.service.ContenuFormationService;
-import iri.elearningapi.service.EtudiantService;
 import iri.elearningapi.service.ImageService;
 import iri.elearningapi.service.MediaService;
 import iri.elearningapi.service.ProfesseurService;
+import iri.elearningapi.service.etudiant.EtudiantService;
 import iri.elearningapi.utils.URLElearning;
 import iri.elearningapi.utils.form.formInt.FormFilter;
 import iri.elearningapi.utils.form.formInt.FormLink;
+import iri.elearningapi.utils.form.formInt.FormMail;
+import iri.elearningapi.utils.form.formInt.FormQCM;
 import iri.elearningapi.utils.form.formOut.FormChapitre;
 import iri.elearningapi.utils.form.formOut.FormViewChapitre;
 import iri.elearningapi.utils.form.formOut.FormViewEtudiant;
@@ -219,6 +224,61 @@ public class AdminController {
 		//TODO: process PUT request
 		Chapitre chapitre2=contenuFormationService.createOrUpdateChapitre(chapitre, false);
 		URLElearning urlElearning=new URLElearning("/cour/"+chapitre2.getIdChapitre());
+		return urlElearning;
+	}
+	
+	@PostMapping("/admin/qro/{idChapitre}")
+	public URLElearning createQRO(@RequestBody Qro qro, @PathVariable("idChapitre") int IdChapitre) {
+		//TODO: process POST request
+		contenuFormationService.createOrUpdateQRO(qro, IdChapitre);
+		URLElearning urlElearning=new URLElearning("/cour/"+IdChapitre);
+		return urlElearning;
+	}
+	
+	@GetMapping("/admin/qcm/{idQcm}")
+	public Qcm getQcm(@PathVariable("idQcm") int idQcm) {
+		return contenuFormationService.getQCM(idQcm);
+	}
+	
+	@PostMapping("/admin/qcm/")
+	public URLElearning createQCM(@RequestBody FormQCM froFormQCM) {
+		//TODO: process POST request
+		Qcm qcm=contenuFormationService.createQCM(froFormQCM);
+		URLElearning urlElearning=new URLElearning("/qcm/"+qcm.getChapitre().getIdChapitre()+"/"+qcm.getId());
+		return urlElearning;
+	}
+	
+	@PutMapping("/admin/qcm")
+	public URLElearning updateQCM(@RequestBody Qcm qcm) {
+		//TODO: process POST request
+		Qcm qcm02=contenuFormationService.updateQcm(qcm);
+		URLElearning urlElearning=new URLElearning("/qcm/"+qcm02.getChapitre().getIdChapitre()+"/"+qcm02.getId());
+		return urlElearning;
+	}
+	
+	@PostMapping("/admin/qcmproposition/{idQCM}")
+	public URLElearning createOrUpdatePropositionQCM(@PathVariable("idQCM") int idQCM,@RequestBody Proposition proposition) {
+		contenuFormationService.CreateOrUpdatePropositionQCM(idQCM, proposition);
+		URLElearning urlElearning=new URLElearning("/cours");
+		return urlElearning;
+	}
+	
+	@DeleteMapping("/admin/qcmproposition/{idProposition}")
+	public URLElearning deletepropositionQCM(@PathVariable("idProposition")int idProposition) {
+		contenuFormationService.deletePropositionQcm(idProposition);
+		URLElearning urlElearning=new URLElearning("/cours");
+		return urlElearning;
+	}
+	
+	/*
+	 * admin controler for MAIL SENDING
+	 * 
+	 * 
+	 */
+	@PostMapping("/admin/sendmail/")
+	public URLElearning sendMailFromFornmail(@RequestBody FormMail formMail) {
+		adminService.envoiMail(formMail);
+		URLElearning urlElearning=new URLElearning("/mail/success");
 		return urlElearning;
 	}
 	

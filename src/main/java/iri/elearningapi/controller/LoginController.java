@@ -8,11 +8,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import iri.elearningapi.service.AdminService;
-import iri.elearningapi.service.EtudiantService;
 import iri.elearningapi.service.JWTService;
+import iri.elearningapi.service.etudiant.EtudiantService;
 import iri.elearningapi.utils.errorClass.ElearningException;
 import iri.elearningapi.utils.errorClass.ErrorAPI;
 import iri.elearningapi.utils.form.formOut.UserElearning;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @CrossOrigin
@@ -46,5 +50,17 @@ public class LoginController {
 			throw new ElearningException(new ErrorAPI("Information de connexion incorrect...!",0));
 		}
 	}
+	
+	@GetMapping("/login/validation/inscription/{lien}")
+	public UserElearning validationInsciptionEtudiant(@PathVariable("lien") String lien) {
+		return etudiantService.validationInscriptionCompte(lien);
+	}
+	
+	@GetMapping("/login/controle/compte/etudiant/{matricule}")
+	public UserElearning getMethodName(@PathVariable("matricule") String matricule) {
+		return etudiantService.controleValidationCompte(matricule);
+	}
+	
+	
 	
 }

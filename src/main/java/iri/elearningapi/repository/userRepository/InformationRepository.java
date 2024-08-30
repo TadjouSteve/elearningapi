@@ -6,12 +6,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import iri.elearningapi.model.userModel.GammeEtudiantProfesseur;
+import iri.elearningapi.model.userModel.Etudiant;
+import iri.elearningapi.model.userModel.Information;
 
 @Repository
-public interface GammeEtudiantProfesseurRepository extends JpaRepository<GammeEtudiantProfesseur, Integer> {
+public interface InformationRepository extends JpaRepository<Information, Integer> {
+	
+	boolean existsByEtudiant(Etudiant etudiant);
+	Information findByEtudiant(Etudiant etudiant);
+	
 	@Modifying
 	@Transactional
-	@Query("DELETE FROM GammeEtudiantProfesseur l WHERE l.id = ?1 ")
+	@Query("DELETE FROM Information l WHERE l.id = ?1 ")
 	void deleteEasy(int id);
 }

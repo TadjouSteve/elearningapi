@@ -39,24 +39,24 @@ import jakarta.persistence.TemporalType;
  * 
  */
 @Entity
-@NamedQuery(name="Chapitre.findAll", query="SELECT c FROM Chapitre c")
+@NamedQuery(name = "Chapitre.findAll", query = "SELECT c FROM Chapitre c")
 public class Chapitre implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id_chapitre")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_chapitre")
 	private int idChapitre;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="date_ajout")
+	@Column(name = "date_ajout")
 	private Date dateAjout;
 
 	@Lob
 	private String description;
-	
+
 	@Lob
 	private String texte;
-	
+
 	@Lob
 	private String image;
 
@@ -67,45 +67,48 @@ public class Chapitre implements Serializable {
 	private String preanbule;
 
 	private int qcm;
-	
+
 	private int ordre;
 
 	@Lob
 	private String titre;
-	
-	private String etat;
 
+	private String etat;
 
 	@Lob
 	private String video;
 
-	//bi-directional many-to-one association to Bloc
-	@OneToMany(mappedBy="chapitre")
+	// bi-directional many-to-one association to Bloc
+	@OneToMany(mappedBy = "chapitre")
 	private List<Bloc> blocs;
 
-	
-	//bi-directional many-to-one association to Module
+	// bi-directional many-to-one association to Module
 	@ManyToOne
-	@JoinColumn(name="id_module")
+	@JoinColumn(name = "id_module")
 	private Module module;
 
-	//bi-directional many-to-one association to ChapitreEn
-	@OneToMany(mappedBy="chapitre")
+	// bi-directional many-to-one association to ChapitreEn
+	@OneToMany(mappedBy = "chapitre")
 	private List<ChapitreEn> chapitreEns;
 
-	//bi-directional many-to-one association to EtudiantChapitre
-	@OneToMany(mappedBy="chapitre")
+	// bi-directional many-to-one association to EtudiantChapitre
+	@OneToMany(mappedBy = "chapitre")
 	@JsonIgnore
 	private List<EtudiantChapitre> etudiantChapitres;
 
-	//bi-directional many-to-one association to Qcm
-	@OneToMany(mappedBy="chapitre")
+	// bi-directional many-to-one association to Qcm
+	@OneToMany(mappedBy = "chapitre")
 	private List<Qcm> qcms;
 
-	//bi-directional many-to-one association to QuestionCour
-	@OneToMany(mappedBy="chapitre")
+	// bi-directional many-to-one association to QuestionCour
+	@OneToMany(mappedBy = "chapitre")
 	@JsonIgnore
 	private List<QuestionCour> questionCours;
+
+	// bi-directional many-to-one association to Qro
+	//@JsonIgnore
+	@OneToMany(mappedBy = "chapitre")
+	private List<Qro> qros;
 
 	public Chapitre() {
 	}
@@ -203,7 +206,6 @@ public class Chapitre implements Serializable {
 
 		return bloc;
 	}
-
 
 	public Module getModule() {
 		return this.module;
@@ -325,5 +327,12 @@ public class Chapitre implements Serializable {
 		this.ordre = ordre;
 	}
 
+	public List<Qro> getQros() {
+		return qros;
+	}
+
+	public void setQros(List<Qro> qros) {
+		this.qros = qros;
+	}
 
 }

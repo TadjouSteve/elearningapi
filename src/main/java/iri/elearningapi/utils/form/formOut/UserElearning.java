@@ -4,19 +4,21 @@ import iri.elearningapi.utils.elearningData.Profil;
 
 public class UserElearning {
 
-	private int		id;
-	private String	nom;
-	private String	login			= "";
-	private String	prenom;
-	private String	email;
-	private String	matricule;
-	private String	telephone;
-	private String	profession		= "";
-	private String	nomEntreprise	= "";
-	private String	matiere			= "";
-	private String	password;
-	private int		level;
-	private Profil	profil;
+	private int id;
+	private String nom;
+	private String login = "";
+	private String prenom;
+	private String email;
+	private String matricule;
+	private String telephone;
+	private String profession = "";
+	private String nomEntreprise = "";
+	private String matiere = "";
+	private String password;
+	private int level;
+	private Profil profil;
+	private int confirmation = 1;
+	private boolean openDashboard = true;
 
 	public UserElearning() {
 		this.nom = "";
@@ -131,5 +133,21 @@ public class UserElearning {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+
+	public int getConfirmation() {
+		return confirmation;
+	}
+
+	public void setConfirmation(int confirmation) {
+		this.confirmation = confirmation;
+	}
+
+	public boolean getOpenDashboard() {
+		return openDashboard;
+	}
+
+	public void setOpenDashboard(boolean openDashboard) {
+		this.openDashboard = openDashboard;
 	}
 }

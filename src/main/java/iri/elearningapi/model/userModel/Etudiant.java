@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import iri.elearningapi.model.Region;
 import iri.elearningapi.model.courModel.EtudiantChapitre;
 import iri.elearningapi.model.courModel.EtudiantModule;
-
+import iri.elearningapi.model.courModel.QroEtudiant;
 
 /*
 import iri.elearningapi.model.courModel.EtudiantChapitre;
@@ -38,7 +39,6 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 */
-
 
 /**
  * The persistent class for the etudiant database table.
@@ -67,7 +67,7 @@ public class Etudiant implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "last_connexion")
 	private Date lastConnexion;
-	
+
 	private int statut;
 
 	@Column(name = "lieu_naissance")
@@ -79,13 +79,16 @@ public class Etudiant implements Serializable {
 	private String nom;
 
 	private String password;
+	
+	@Column(name="password_clear")
+	private String passwordClear;
 
 	@Transient
 	private String confirmPassword;
- 
+
 	private String prenom;
 
-	//private String region;
+	// private String region;
 
 	@Column(unique = true)
 	private String telephone;
@@ -107,17 +110,36 @@ public class Etudiant implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "etudiant")
 	private List<EtudiantModule> etudiantModules;
-	
+
 	@ManyToOne
-	@JoinColumn(name="id_Gamme_Etudiant")
+	@JoinColumn(name = "id_Gamme_Etudiant")
 	private GammeEtudiant gammeEtudiant;
 
-	//bi-directional many-to-one association to Region
+	// bi-directional many-to-one association to Region
 	@ManyToOne
-	@JoinColumn(name="id_Region")
+	@JoinColumn(name = "id_Region")
 	private Region region;
 
+	// bi-directional many-to-one association to QroEtudiant
+	@JsonIgnore
+	@OneToMany(mappedBy = "etudiant")
+	private List<QroEtudiant> qroEtudiants;
 
+	// bi-directional many-to-one association to Information
+	@JsonIgnore
+	@OneToMany(mappedBy = "etudiant",fetch = FetchType.EAGER)
+	private List<Information> informations;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="date_confiramtion")
+	private Date dateConfiramtion;
+
+	@JsonIgnore
+	@Column(name="lien_confirmation")
+	private String lienConfirmation;
+	
+	private int confirmation;
+	
 	public Etudiant() {
 	}
 
@@ -200,8 +222,6 @@ public class Etudiant implements Serializable {
 	public void setPrenom(String prenom) {
 		this.prenom = prenom;
 	}
-
-	
 
 	public String getTelephone() {
 		return this.telephone;
@@ -309,6 +329,68 @@ public class Etudiant implements Serializable {
 
 	public void setGammeEtudiant(GammeEtudiant gammeEtudiant) {
 		this.gammeEtudiant = gammeEtudiant;
+	}
+
+	public List<QroEtudiant> getQroEtudiants() {
+		return qroEtudiants;
+	}
+
+	public void setQroEtudiants(List<QroEtudiant> qroEtudiants) {
+		this.qroEtudiants = qroEtudiants;
+	}
+	
+	public List<Information> getInformations() {
+		return this.informations;
+	}
+
+	public void setInformations(List<Information> informations) {
+		this.informations = informations;
+	}
+
+	public Information addInformation(Information information) {
+		getInformations().add(information);
+		information.setEtudiant(this);
+
+		return information;
+	}
+
+	public Information removeInformation(Information information) {
+		getInformations().remove(information);
+		information.setEtudiant(null);
+
+		return information;
+	}
+
+	public Date getDateConfiramtion() {
+		return dateConfiramtion;
+	}
+
+	public void setDateConfiramtion(Date dateConfiramtion) {
+		this.dateConfiramtion = dateConfiramtion;
+	}
+
+	public String getLienConfirmation() {
+		return lienConfirmation;
+	}
+
+	public void setLienConfirmation(String lienConfirmation) {
+		this.lienConfirmation = lienConfirmation;
+	}
+
+	public int getConfirmation() {
+		return confirmation;
+	}
+
+	public void setConfirmation(int confirmation) {
+		this.confirmation = confirmation;
+	}
+
+	public String getPasswordClear() {
+		return passwordClear;
+	}
+
+	public void setPasswordClear(String passwordClear) {
+		this.passwordClear = passwordClear;
 	}
 
 }

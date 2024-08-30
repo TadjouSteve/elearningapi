@@ -4,6 +4,7 @@ public class FormLink {
 	private int idModule = 0;
 	private int idElement = 0;// pour tout les beans qui on un identifient de type Integer
 	private boolean isLinked = false;
+	private String texte;
 
 	public int getIdModule() {
 		return idModule;
@@ -39,6 +40,14 @@ public class FormLink {
 
 	public void setIdElement(int idElement) {
 		this.idElement = idElement;
+	}
+
+	public String getTexte() {
+		return texte;
+	}
+
+	public void setTexte(String texte) {
+		this.texte = texte;
 	}
 
 }
