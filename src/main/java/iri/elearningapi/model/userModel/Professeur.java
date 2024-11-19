@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import iri.elearningapi.model.Message;
 import iri.elearningapi.model.Region;
+import iri.elearningapi.model.courModel.EtudiantChapitre;
 import iri.elearningapi.model.courModel.ProfesseurModule;
 import iri.elearningapi.model.courModel.Reponse;
 import lombok.Data;
@@ -107,6 +108,11 @@ public class Professeur implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "id_Region")
 	private Region region;
+
+	// bi-directional many-to-one association to EtudiantChapitre
+	@JsonIgnore
+	@OneToMany(mappedBy = "professeur")
+	private List<EtudiantChapitre> etudiantChapitres;
 
 	public Professeur() {
 	}
@@ -272,7 +278,7 @@ public class Professeur implements Serializable {
 	public void setRegion(Region region) {
 		this.region = region;
 	}
-	
+
 	public List<GammeEtudiantProfesseur> getGammeEtudiantProfesseurs() {
 		return this.gammeEtudiantProfesseurs;
 	}
@@ -293,5 +299,13 @@ public class Professeur implements Serializable {
 		gammeEtudiantProfesseur.setProfesseur(null);
 
 		return gammeEtudiantProfesseur;
+	}
+
+	public List<EtudiantChapitre> getEtudiantChapitres() {
+		return etudiantChapitres;
+	}
+
+	public void setEtudiantChapitres(List<EtudiantChapitre> etudiantChapitres) {
+		this.etudiantChapitres = etudiantChapitres;
 	}
 }

@@ -23,6 +23,7 @@ import iri.elearningapi.model.courModel.Qcm;
 import iri.elearningapi.model.courModel.Qro;
 import iri.elearningapi.model.mediaModel.Article;
 import iri.elearningapi.model.mediaModel.Rubrique;
+import iri.elearningapi.model.userModel.Candidature;
 import iri.elearningapi.model.userModel.Etudiant;
 import iri.elearningapi.model.userModel.Professeur;
 import iri.elearningapi.service.AdminService;
@@ -75,11 +76,23 @@ public class AdminController {
 	public Page<Etudiant> getAllEtudiant(@PathVariable("pageNumber") int pageNumber) {
 		return etudiantService.getListEtudiants(null, pageNumber);
 	}
-
+	
+	@GetMapping("/admin/candidature/{idCandidature}")
+	public Candidature getCandidature(@PathVariable("idCandidature") int idCandidature) {
+		return etudiantService.getCandidature(idCandidature);
+	}
+	
 	@GetMapping("/admin/etudiant/{matricule}")
 	public FormViewEtudiant getFormViewEtudiantByAdmin(@PathVariable("matricule") String matriculeEtudiant) {
 		return etudiantService.getFormViewEtudiantForAdmin(matriculeEtudiant, null);
 	}
+	
+	@GetMapping("/admin/candidatures/{pageNumber}")
+	public Page<Candidature> getAllCandidature(@PathVariable("pageNumber") int pageNumber) {
+		return etudiantService.getListCandidaturePage(null, pageNumber);
+	}
+
+	
 
 	@GetMapping("/admin/professeurs/{pageNumber}")
 	public Page<Professeur> getAllProfesseur(@PathVariable("pageNumber") int pageNumber) {
@@ -282,4 +295,32 @@ public class AdminController {
 		return urlElearning;
 	}
 	
+	@PostMapping("/admin/sendmail/{idEtudiant}")
+	public URLElearning sendMailToEtudiant(@PathVariable("idEtudiant")int idEtudiant,@RequestBody FormMail formMail) {
+		etudiantService.sendMailToStudent(formMail,idEtudiant);
+		URLElearning urlElearning=new URLElearning("/mail/success");
+		return urlElearning;
+	}
+	
+	/*
+	 * envoi video pour un chapitre
+	 * 
+	 * 
+	 */
+	@PostMapping("/admin/uploadvidoechapitre/{idChapitre}")
+	public URLElearning sendMailFromFornmail(@PathVariable("idChapitre") int idChapitre,@RequestParam("image") MultipartFile file) {
+		contenuFormationService.setVideoChapitre(idChapitre, file);
+		URLElearning urlElearning=new URLElearning();
+		return urlElearning;
+	}
+	
+	/*
+	 * envoi des certification pour chaque cour
+	 * 
+	 */
+	
+	@PostMapping("/admin/generete/attestation/")
+	public List<Etudiant> generetedAttestationByChapitreAndSendByMail(@RequestBody FormLink formLink) {
+		return adminService.sendAttestationByEmailToStudentByChapitre(formLink);
+	}
 }

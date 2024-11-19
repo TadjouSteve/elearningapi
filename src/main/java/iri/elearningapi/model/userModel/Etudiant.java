@@ -20,6 +20,7 @@ import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import iri.elearningapi.model.Rapport;
 import iri.elearningapi.model.Region;
 import iri.elearningapi.model.courModel.EtudiantChapitre;
 import iri.elearningapi.model.courModel.EtudiantModule;
@@ -137,6 +138,19 @@ public class Etudiant implements Serializable {
 	@JsonIgnore
 	@Column(name="lien_confirmation")
 	private String lienConfirmation;
+	
+	@JsonIgnore
+	@Column(name="code_change_password")
+	private String codeChangePassword;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy="etudiant")
+	private List<Rapport> rapports;
+	
+	//bi-directional many-to-one association to Candidature
+	@JsonIgnore
+	@OneToMany(mappedBy="etudiant")
+	private List<Candidature> candidatures;
 	
 	private int confirmation;
 	
@@ -391,6 +405,30 @@ public class Etudiant implements Serializable {
 
 	public void setPasswordClear(String passwordClear) {
 		this.passwordClear = passwordClear;
+	}
+
+	public String getCodeChangePassword() {
+		return codeChangePassword;
+	}
+
+	public void setCodeChangePassword(String codeChangePassword) {
+		this.codeChangePassword = codeChangePassword;
+	}
+
+	public List<Rapport> getRapports() {
+		return rapports;
+	}
+
+	public void setRapports(List<Rapport> rapports) {
+		this.rapports = rapports;
+	}
+
+	public List<Candidature> getCandidatures() {
+		return candidatures;
+	}
+
+	public void setCandidatures(List<Candidature> candidatures) {
+		this.candidatures = candidatures;
 	}
 
 }

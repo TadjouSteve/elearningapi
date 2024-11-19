@@ -1,5 +1,6 @@
 package iri.elearningapi.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -11,13 +12,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import iri.elearningapi.model.courModel.Chapitre;
+import iri.elearningapi.model.courModel.EtudiantChapitre;
 import iri.elearningapi.model.courModel.Module;
 import iri.elearningapi.model.courModel.ProfesseurModule;
+import iri.elearningapi.model.courModel.QroEtudiant;
+import iri.elearningapi.model.userModel.Etudiant;
 import iri.elearningapi.model.userModel.Professeur;
+import iri.elearningapi.repository.courRepository.ChapitreRepository;
+import iri.elearningapi.repository.courRepository.EtudiantChapitreRepository;
 import iri.elearningapi.repository.courRepository.ModuleRepository;
 import iri.elearningapi.repository.courRepository.ProfesseurModuleRepository;
+import iri.elearningapi.repository.courRepository.QroEtudiantRepository;
 import iri.elearningapi.repository.userRepository.EtudiantRepository;
 import iri.elearningapi.repository.userRepository.ProfesseurRepository;
+import iri.elearningapi.utils.elearningData.Profil;
+import iri.elearningapi.utils.elearningData.Statut;
 import iri.elearningapi.utils.elearningFunction.Cryptage;
 import iri.elearningapi.utils.elearningFunction.Methode;
 import iri.elearningapi.utils.elearningFunction.PasswordGenerator;
@@ -25,7 +35,11 @@ import iri.elearningapi.utils.elearningFunction.SenderMail;
 import iri.elearningapi.utils.errorClass.ElearningException;
 import iri.elearningapi.utils.errorClass.ErrorAPI;
 import iri.elearningapi.utils.form.formInt.FormLink;
+import iri.elearningapi.utils.form.formOut.FormChapitre;
+import iri.elearningapi.utils.form.formOut.FormCorrectionQro;
+import iri.elearningapi.utils.form.formOut.FormModule;
 import iri.elearningapi.utils.form.formOut.FormViewProfesseur;
+import iri.elearningapi.utils.form.formOut.UserElearning;
 
 @Service
 public class ProfesseurService {
@@ -36,15 +50,46 @@ public class ProfesseurService {
 	private EtudiantRepository etudiantRepository;
 
 	@Autowired
+	private QroEtudiantRepository qroEtudiantRepository;
+
+	@Autowired
 	private ModuleRepository moduleRepository;
+
+	@Autowired
+	private EtudiantChapitreRepository etudiantChapitreRepository;
 
 	@Autowired
 	private ProfesseurModuleRepository professeurModuleRepository;
 
 	@Autowired
+	private ChapitreRepository chapitreRepository;
+
+	@Autowired
 	private SenderMail senderMail;
 
 	private static final Random RANDOM = new Random();
+
+	public UserElearning getLoginProf(UserElearning userLogin) {
+		Professeur professeur = new Professeur();
+
+		professeur = professeurRepository.findByTelephone(userLogin.getLogin());
+		if (professeur != null && professeurRepository.existsById(professeur.getId())) {
+			UserElearning user = new UserElearning();
+			user.setEmail(professeur.getEmail());
+			user.setId(professeur.getId());
+			// user.setMatricule(etudiant.getMatricule());
+			user.setNom(professeur.getNom());
+			user.setPrenom(professeur.getPrenom());
+			user.setProfil(Profil.PROFESSEUR_USER);
+			user.setPassword(professeur.getPassword());
+			user.setLevel(3);
+			user.setConfirmation(1);
+			user.setOpenDashboard(true);
+			return user;
+		}
+
+		return null;
+	}
 
 	public Page<Professeur> getListProfesseurs(String filter, int pageNumber) {
 		Pageable pageable = PageRequest.of(pageNumber, 50);
@@ -78,7 +123,7 @@ public class ProfesseurService {
 		professeur.setPassword(passworrd);
 		// System.out.println("Pass Word: "+professeur.getPassword());
 		senderMail.sendMailAfterRegistration(professeur);
-		professeur.setPassword("");
+		// professeur.setPassword("");
 		return professeur;
 	}
 
@@ -147,7 +192,7 @@ public class ProfesseurService {
 
 	public void linkProfesseurToModule(String matriculeProfesseur, List<FormLink> formLinks) {
 		for (FormLink formLink : formLinks) {
-			System.out.println("les lien idmodule: "+formLink.getIdModule()+" || islinked= "+formLink.isLinked());
+			System.out.println("les lien idmodule: " + formLink.getIdModule() + " || islinked= " + formLink.isLinked());
 		}
 		if (professeurRepository.existsByMatricule(matriculeProfesseur)) {
 			Professeur professeur = professeurRepository.findByMatricule(matriculeProfesseur);
@@ -165,7 +210,7 @@ public class ProfesseurService {
 							professeurModule.setModule(module);
 							professeurModule.setProfesseur(professeur);
 							professeurModuleRepository.save(professeurModule);
-							//System.out.println("enregistrement du lien");
+							// System.out.println("enregistrement du lien");
 						}
 
 					} else {
@@ -176,7 +221,7 @@ public class ProfesseurService {
 									.findAny();
 							if (professeurModuleOptional.isPresent()) {
 								professeurModuleRepository.deleteEasy(professeurModuleOptional.get().getId());
-								//System.out.println("supression du lien");
+								// System.out.println("supression du lien");
 							}
 						}
 					}
@@ -185,4 +230,109 @@ public class ProfesseurService {
 			}
 		}
 	}
+
+	public List<FormModule> getListModules() {
+		List<FormModule> formModules = new ArrayList<FormModule>();
+
+		for (Module module : moduleRepository.findAllByOrderByTitreAsc()) {
+			if (!module.getGammeEtudiantModules().isEmpty()) {
+				FormModule formModule = new FormModule();
+				formModule.setIdModule(module.getIdModule());
+				formModule.setTitre(module.getTitre());
+				formModule.setTitreEn(module.getTitreEn());
+
+				List<FormChapitre> formChapitres = new ArrayList<FormChapitre>();
+
+				for (Chapitre chapitre : module.getChapitres()) {
+					FormChapitre formChapitre = new FormChapitre();
+					formChapitre.setIdChapitre(chapitre.getIdChapitre());
+					formChapitre.setIdModule(module.getIdModule());
+					formChapitre.setTitre(chapitre.getTitre());
+					formChapitre.setTotalQRO(chapitre.getQros().size());
+					formChapitre.setTitreModule(module.getTitre());
+
+					formChapitres.add(formChapitre);
+				}
+
+				formModule.setChapitres(formChapitres);
+
+				formModules.add(formModule);
+			}
+
+		}
+		return formModules;
+	}
+
+	public FormCorrectionQro getFormCorrectionQro(int idChapitre) {
+		if (chapitreRepository.existsById(idChapitre)) {
+			Chapitre chapitre = chapitreRepository.findById(idChapitre).get();
+			FormCorrectionQro formCorrectionQro = new FormCorrectionQro();
+			Boolean haveQRO = false;
+			System.out.println("Etape :01");
+			do {
+				System.out.println("Etape :02");
+				EtudiantChapitre etudiantChapitre;
+				List<EtudiantChapitre> listEtudiantChapitres = etudiantChapitreRepository
+						.findByChapitreAndStatut(chapitre, Statut.NOT_CORRECTED.name());
+
+				if (!listEtudiantChapitres.isEmpty()) {
+					etudiantChapitre = listEtudiantChapitres.get(0);
+					Etudiant etudiant = etudiantChapitre.getEtudiant();
+					
+					List<QroEtudiant> qroEtudiants = new ArrayList<QroEtudiant>();
+					for (QroEtudiant qroEtudiant : etudiant.getQroEtudiants()) {
+						if (qroEtudiant.getQro().getChapitre().getIdChapitre() == chapitre.getIdChapitre()) {
+							qroEtudiants.add(qroEtudiant);
+						}
+					}
+					haveQRO = !qroEtudiants.isEmpty();
+
+					System.out.println("value HaveQRO 01 :" + haveQRO);
+					System.out.println("value HaveQRO 01-01 :" + etudiant.getQroEtudiants().isEmpty());
+					if (!haveQRO) {
+						etudiantChapitre.setStatut(Statut.CORRECTED.name());
+						etudiantChapitreRepository.save(etudiantChapitre);
+						System.out.println("Etape :02 mise a jour du statut");
+					}
+					formCorrectionQro.setEtudiant(etudiant);
+					formCorrectionQro.setQroEtudiants(qroEtudiants);
+				} else {
+					haveQRO = true;
+				}
+				System.out.println("value HaveQRO 02 :" + haveQRO);
+			} while (!haveQRO);
+			System.out.println("Etape :03");
+			return formCorrectionQro;
+		} else {
+			throw new ElearningException(new ErrorAPI("le chapitre utilisaer pour recuperer les qro n'existe pas"));
+		}
+	}
+
+	public void setScoreQRO(List<FormLink> formScoreQros) {
+		if (!formScoreQros.isEmpty()) {
+			for (FormLink formScoreQro : formScoreQros) {
+				if (qroEtudiantRepository.existsById(formScoreQro.getIdElement())) {
+					QroEtudiant qroEtudiant = qroEtudiantRepository.findById(formScoreQro.getIdElement()).get();
+					qroEtudiant.setNote(formScoreQro.getNote());
+					qroEtudiant=qroEtudiantRepository.save(qroEtudiant);
+				}
+			}
+
+			FormLink formScoreQro01 = formScoreQros.get(0);
+			if (qroEtudiantRepository.existsById(formScoreQro01.getIdElement())) {
+				QroEtudiant qroEtudiant = qroEtudiantRepository.findById(formScoreQro01.getIdElement()).get();
+				Chapitre chapitre = qroEtudiant.getQro().getChapitre();
+				Etudiant etudiant = qroEtudiant.getEtudiant();
+
+				EtudiantChapitre etudiantChapitre = etudiantChapitreRepository.findByEtudiantAndChapitre(etudiant,
+						chapitre);
+				etudiantChapitre.setStatut(Statut.CORRECTED.name());
+				etudiantChapitre.setDateCorrection(new Date());
+				etudiantChapitre = etudiantChapitreRepository.save(etudiantChapitre);
+			}
+		}else {
+			//throw new ElearningException(new ErrorAPI("La liste des reponses envoyer est vide"));
+		}
+	}
+
 }

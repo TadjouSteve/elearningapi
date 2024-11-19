@@ -1,9 +1,10 @@
 package iri.elearningapi.utils.form.formInt;
 
 public class FormMail {
-	private String objet="";
-	private String bodyHtml="";
-	private String profil="";
+	private String objet = "";
+	private String bodyHtml = "";
+	private String profil = "";
+	private int idRegion = 0;
 
 	public String getObjet() {
 		return objet;
@@ -27,5 +28,13 @@ public class FormMail {
 
 	public void setProfil(String profil) {
 		this.profil = profil;
+	}
+
+	public int getIdRegion() {
+		return idRegion;
+	}
+
+	public void setIdRegion(int idRegion) {
+		this.idRegion = idRegion;
 	}
 }

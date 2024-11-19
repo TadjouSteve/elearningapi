@@ -7,17 +7,20 @@ import iri.elearningapi.model.courModel.Module;
 
 public class UserDashboard {
 
-	private int	courLu				= 0;
-	private int	QCMValide			= 0;
-	private int	moduleAccessible	= 0;
+	private int courLu = 0;
+	private int QCMValide = 0;
+	private int moduleAccessible = 0;
 
-	private int		moduleActif		= 0;
-	private int		moduleTotal		= 0;
-	private int		chapitreTotal	= 0;
-	private int		qcmValide		= 0;
-	private int		qcmTotal		= 0;
-	private float	tauxReuissite	= 0;
-	private int		questionPose	= 0;
+	private int qroRepondu = 0;
+	private int qroTotal = 0;
+
+	private int moduleActif = 0;
+	private int moduleTotal = 0;
+	private int chapitreTotal = 0;
+	private int qcmValide = 0;
+	private int qcmTotal = 0;
+	private float tauxReuissite = 0;
+	private int questionPose = 0;
 
 	List<Module> modules = new ArrayList<>();
 
@@ -121,6 +124,24 @@ public class UserDashboard {
 
 	public void setQcmTotal(int qcmTotal) {
 		this.qcmTotal = qcmTotal;
+	}
+
+	
+
+	public int getQroTotal() {
+		return qroTotal;
+	}
+
+	public void setQroTotal(int qroTotal) {
+		this.qroTotal = qroTotal;
+	}
+
+	public int getQroRepondu() {
+		return qroRepondu;
+	}
+
+	public void setQroRepondu(int qroRepondu) {
+		this.qroRepondu = qroRepondu;
 	}
 
 }

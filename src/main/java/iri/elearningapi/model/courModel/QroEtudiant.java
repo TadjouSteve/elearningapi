@@ -43,6 +43,8 @@ public class QroEtudiant implements Serializable {
 
 	@Lob
 	private String reponse;
+	
+	private int note;
 
 	//bi-directional many-to-one association to Etudiant
 	@ManyToOne
@@ -103,6 +105,14 @@ public class QroEtudiant implements Serializable {
 
 	public void setQro(Qro qro) {
 		this.qro = qro;
+	}
+
+	public int getNote() {
+		return note;
+	}
+
+	public void setNote(int note) {
+		this.note = note;
 	}
 
 }

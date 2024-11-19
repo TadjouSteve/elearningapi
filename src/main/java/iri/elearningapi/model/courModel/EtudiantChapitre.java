@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import iri.elearningapi.model.userModel.Etudiant;
+import iri.elearningapi.model.userModel.Professeur;
 
 //import com.fasterxml.jackson.annotation.JsonIgnore;
 /*
@@ -30,43 +31,52 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 */
 
-
-
 /**
  * The persistent class for the etudiant_chapitre database table.
  * 
  */
 @Entity
-@Table(name="etudiant_chapitre")
-@NamedQuery(name="EtudiantChapitre.findAll", query="SELECT e FROM EtudiantChapitre e")
+@Table(name = "etudiant_chapitre")
+@NamedQuery(name = "EtudiantChapitre.findAll", query = "SELECT e FROM EtudiantChapitre e")
 public class EtudiantChapitre implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
 	private String etat;
 
-	@Column(name="qcm_valide")
+	private String statut;
+
+	@Column(name = "qcm_valide")
 	private int qcmValide;
 
-	//bi-directional many-to-one association to Chapitre
+	// bi-directional many-to-one association to Chapitre
 	@ManyToOne
-	@JoinColumn(name="id_chapitre")
+	@JoinColumn(name = "id_chapitre")
 	private Chapitre chapitre;
 
-	//bi-directional many-to-one association to Etudiant
+	// bi-directional many-to-one association to Etudiant
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name="id_etudiant")
+	@JoinColumn(name = "id_etudiant")
 	private Etudiant etudiant;
-	
-	@Column(name="date_debut")
+
+	@Column(name = "date_debut")
 	private Date dateDebut;
-	
-	@Column(name="date_validation_qcm")
+
+	@Column(name = "date_correction")
+	private Date dateCorrection;
+
+	@Column(name = "date_validation_qcm")
 	private Date dateValidationQcm;
+
+	// bi-directional many-to-one association to Professeur
+	@JsonIgnore
+	@ManyToOne
+	@JoinColumn(name = "id_professeur")
+	private Professeur professeur;
 
 	public EtudiantChapitre() {
 	}
@@ -125,6 +135,30 @@ public class EtudiantChapitre implements Serializable {
 
 	public void setDateValidationQcm(Date dateValidationQcm) {
 		this.dateValidationQcm = dateValidationQcm;
+	}
+
+	public String getStatut() {
+		return statut;
+	}
+
+	public void setStatut(String statut) {
+		this.statut = statut;
+	}
+
+	public Date getDateCorrection() {
+		return dateCorrection;
+	}
+
+	public void setDateCorrection(Date dateCorrection) {
+		this.dateCorrection = dateCorrection;
+	}
+
+	public Professeur getProfesseur() {
+		return professeur;
+	}
+
+	public void setProfesseur(Professeur professeur) {
+		this.professeur = professeur;
 	}
 
 }

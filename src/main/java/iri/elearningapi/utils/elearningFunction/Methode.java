@@ -1,6 +1,8 @@
 package iri.elearningapi.utils.elearningFunction;
 
+import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,16 +50,48 @@ public class Methode {
 		return isCorrectString(string, 0,0);
 	}
 	
-	public static void returnErrorAPI(String meassage,int step) {
-		throw new ElearningException(new ErrorAPI("cette question n'existe pas...!",step));
+	public static void returnErrorAPI(String message,int step) {
+		throw new ElearningException(new ErrorAPI(message,step));
 	}
 	
-	public static void returnErrorAPI(String meassage) {
-		returnErrorAPI(meassage, 0);
+	public static void returnErrorAPI(String message) {
+		returnErrorAPI(message, 0);
 	}
 	
 	public static void printOut(String meassage) {
 		System.out.println(meassage);
 	}
+	
+	
+	public static int calculateHoursDifference(Date startDate, Date endDate) {
+        long diffInMillies = Math.abs(endDate.getTime() - startDate.getTime());
+        return (int) TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+    }
+	
+	public static int calculateDaysDifference(Date startDate, Date endDate) {
+        long diffInMillies = Math.abs(endDate.getTime() - startDate.getTime());
+        return (int) TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+    }
+	
+	
+	public static String capitalizeFirstLetter(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
 
+        String[] words = text.split("\\s+");  // Sépare le texte par espaces
+        StringBuilder capitalizedText = new StringBuilder();
+
+        for (String word : words) {
+            if (word.length() > 0) {
+                // Convertit la première lettre en majuscule et le reste on laisse comme c'etait
+                capitalizedText.append(Character.toUpperCase(word.charAt(0)))
+                               .append(word.substring(1))
+                               .append(" ");
+            }
+        }
+
+        // Retirer l'espace finale et retourner le texte
+        return capitalizedText.toString().trim();
+    }
 }

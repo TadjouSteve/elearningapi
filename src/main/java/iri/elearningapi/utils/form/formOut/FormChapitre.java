@@ -14,6 +14,9 @@ public class FormChapitre {
 	private int totalQcmValide = 0;
 	private String imageURL = "";
 	private String titreModule = "";
+	
+	private int totalQRO = 0;
+	private int totalQroRepondu = 0;
 
 	public int getIdChapitre() {
 		return idChapitre;
@@ -102,6 +105,22 @@ public class FormChapitre {
 
 	public void setOrdre(int ordre) {
 		this.ordre = ordre;
+	}
+
+	public int getTotalQRO() {
+		return totalQRO;
+	}
+
+	public void setTotalQRO(int totalQRO) {
+		this.totalQRO = totalQRO;
+	}
+
+	public int getTotalQroRepondu() {
+		return totalQroRepondu;
+	}
+
+	public void setTotalQroRepondu(int totalQroRepondu) {
+		this.totalQroRepondu = totalQroRepondu;
 	}
 
 }

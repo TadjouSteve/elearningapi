@@ -89,6 +89,22 @@ public class Module implements Serializable {
 	
 	@Transient
 	private  Boolean isAccessible;
+	
+	@Transient
+	private  int totalChapitre;
+	
+	@Transient
+	private  int chapitreLu;
+	
+	@Transient
+	private int qroTotal;
+	
+	@Transient
+	private int qroRepondu;
+	
+	@Transient
+	private Date dateStart;
+	
 
 	public Module() {
 	}
@@ -305,6 +321,46 @@ public class Module implements Serializable {
 		gammeEtudiantModule.setModule(null);
 
 		return gammeEtudiantModule;
+	}
+
+	public int getTotalChapitre() {
+		return totalChapitre;
+	}
+
+	public void setTotalChapitre(int totalChapitre) {
+		this.totalChapitre = totalChapitre;
+	}
+
+	public int getChapitreLu() {
+		return chapitreLu;
+	}
+
+	public void setChapitreLu(int chapitreLu) {
+		this.chapitreLu = chapitreLu;
+	}
+
+	public int getQroTotal() {
+		return qroTotal;
+	}
+
+	public void setQroTotal(int qroTotal) {
+		this.qroTotal = qroTotal;
+	}
+
+	public int getQroRepondu() {
+		return qroRepondu;
+	}
+
+	public void setQroRepondu(int qroRepondu) {
+		this.qroRepondu = qroRepondu;
+	}
+
+	public Date getDateStart() {
+		return dateStart;
+	}
+
+	public void setDateStart(Date dateStart) {
+		this.dateStart = dateStart;
 	}
 
 	

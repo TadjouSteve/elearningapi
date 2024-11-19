@@ -19,6 +19,7 @@ public interface EtudiantRepository extends JpaRepository<Etudiant, Integer> {
 	boolean existsByEmail(String email);
 	
 	boolean existsByLienConfirmation(String lienConfirmation);
+	boolean existsByCodeChangePassword(String codeChangePassword);
 	
 	
 	//List<Etudiant> findNomStartingWithOrderByNomAsc(String nom);
@@ -35,6 +36,7 @@ public interface EtudiantRepository extends JpaRepository<Etudiant, Integer> {
 	Etudiant findByPassword(String password);
 	
 	Etudiant findByLienConfirmation(String lienConfirmation);
+	Etudiant findByCodeChangePassword(String codeChangePassword);
 	
 	
 	Etudiant findByEmail(String email);

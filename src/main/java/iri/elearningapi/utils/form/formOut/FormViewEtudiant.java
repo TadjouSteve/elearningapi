@@ -20,6 +20,9 @@ public class FormViewEtudiant {
 	protected int		moduleTotal		= 0;
 	protected int		chapitreTotal	= 0;
 	protected int		qcmTotal		= 0;
+	protected int		qroTotal		= 0;
+
+	
 
 	HashMap<Integer, String>	listModule			= new HashMap<>();
 	List<ChapitreSimpleform>	chapitreSimpleforms	= new ArrayList<>();
@@ -52,6 +55,7 @@ public class FormViewEtudiant {
 			chapitreSimpleform.setIdModule((chapitre.getModule() != null) ? chapitre.getModule().getIdModule() : 0);
 			chapitreSimpleform.setTitre(chapitre.getTitre());
 			chapitreSimpleform.setQcm(chapitre.getQcms() != null ? chapitre.getQcms().size() : 0);
+			chapitreSimpleform.setQro(chapitre.getQros()!=null?chapitre.getQros().size():0);
 			chapitreSimpleforms.add(chapitreSimpleform);
 		}
 
@@ -109,6 +113,14 @@ public class FormViewEtudiant {
 	public void setQcmTotal(int qcmTotal) {
 		this.qcmTotal = qcmTotal;
 	}
+	
+	public int getQroTotal() {
+		return qroTotal;
+	}
+
+	public void setQroTotal(int qroTotal) {
+		this.qroTotal = qroTotal;
+	}
 
 	public HashMap<Integer, String> getListModule() {
 		return listModule;
@@ -155,6 +167,7 @@ public class FormViewEtudiant {
 		protected int		idModule;
 		protected String	titre;
 		protected int		qcm;
+		protected int		qro;
 
 		public int getIdChapitre() {
 			return idChapitre;
@@ -186,6 +199,14 @@ public class FormViewEtudiant {
 
 		public void setQcm(int qcm) {
 			this.qcm = qcm;
+		}
+		
+		public int getQro() {
+			return qro;
+		}
+
+		public void setQro(int qro) {
+			this.qro = qro;
 		}
 
 	}

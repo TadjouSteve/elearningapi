@@ -1,15 +1,23 @@
 package iri.elearningapi.service;
 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-
-import javax.swing.JSpinner.ListEditor;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import iri.elearningapi.model.courModel.Chapitre;
 import iri.elearningapi.model.courModel.GammeEtudiantModule;
@@ -34,6 +42,7 @@ import iri.elearningapi.repository.userRepository.GammeEtudiantRepository;
 import iri.elearningapi.repository.userRepository.ProfesseurRepository;
 import iri.elearningapi.utils.elearningData.Etat;
 import iri.elearningapi.utils.elearningFunction.Methode;
+import iri.elearningapi.utils.elearningFunction.SenderMail;
 import iri.elearningapi.utils.errorClass.ElearningException;
 import iri.elearningapi.utils.errorClass.ErrorAPI;
 import iri.elearningapi.utils.form.formInt.FormFilter;
@@ -66,6 +75,9 @@ public class ContenuFormationService {
 
 	@Autowired
 	private QroEtudiantRepository qroEtudiantRepository;
+	
+	@Value("${chemin.elearning.dir}")
+	private String cheminElearninguiString;
 
 	// @Autowired
 	// private EtudiantModuleRepository etudiantModuleRepository;
@@ -84,6 +96,9 @@ public class ContenuFormationService {
 	
 	@Autowired
 	private PropositionRepository propositionRepository;
+	
+	@Autowired
+	private SenderMail senderMail;
 
 	public List<Module> getListModuule(FormFilter filter) {
 		List<Module> modules = new ArrayList<Module>();
@@ -229,6 +244,7 @@ public class ContenuFormationService {
 					: "");
 			formChapitre.setTitreModule(chapitre.getModule() != null ? chapitre.getModule().getTitre() : null);
 			formChapitre.setTotalQcm(chapitre.getQcms().size());
+			formChapitre.setTotalQRO(chapitre.getQros().size());
 			formChapitre.setEtat(chapitre.getEtat());
 
 			formChapitres.add(formChapitre);
@@ -376,6 +392,8 @@ public class ContenuFormationService {
 							previewQroEtudiant.setReponse(formLink.getTexte());
 							qroEtudiantRepository.save(previewQroEtudiant);
 						}
+						
+						
 
 					} else {
 						throw new ElearningException(
@@ -383,6 +401,21 @@ public class ContenuFormationService {
 					}
 				} else {
 					Methode.returnErrorAPI("qro inexistant");
+				}
+			}
+			if (formLinks!=null && !formLinks.isEmpty()) {
+					//Qro qro=qr
+				Chapitre chapitre=qroRepository.findById(formLinks.get(0).getIdElement()).get().getChapitre();
+				Boolean allQroHaveResponse=true;
+				for (Qro qro : chapitre.getQros()) {
+					if (!qroEtudiantRepository.existsByEtudiantAndQro(etudiant, qro)) {
+						allQroHaveResponse=false;
+					}
+				}
+				
+				if (allQroHaveResponse) {
+					senderMail.sendMailFinishAllQroChapitre(etudiant, chapitre);
+					System.out.println("Mail de felicitaion envoyer pour  avoir repondu a toute les question");
 				}
 			}
 		} else {
@@ -497,6 +530,67 @@ public class ContenuFormationService {
 			}
 			qcmRepository.deleteEasy(idQcm);
 		}
+	}
+	
+	public void setVideoChapitre(int idChapitre,MultipartFile fileVideo) {
+		Path rootLocation = Paths.get(cheminElearninguiString+"/videos");
+		if (chapitreRepository.existsById(idChapitre)) {
+			Chapitre chapitre=chapitreRepository.findById(idChapitre).get();
+			// Enregistrement de la vidéo
+			if (!Files.exists(rootLocation)) {
+	            try {
+					Files.createDirectories(rootLocation);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					throw new ElearningException(new ErrorAPI("Erreur lors du téléchargement du fichier. #710"));
+				}
+	        }
+	        if (fileVideo != null && !fileVideo.isEmpty()) {
+	        	
+	        	String contentType = fileVideo.getContentType();
+	        	// Vérifier si le type MIME correspond à une vidéo
+	            if (contentType != null && contentType.startsWith("video/")) {
+	            	chapitre.setVideo(("/videos/"+saveFile(rootLocation, fileVideo)).replace(".mp4.mp4", ".mp4"));
+	            } else {
+	                throw new ElearningException(new ErrorAPI("Le fichier envoyer n'est pas une vidéo valide."));
+	            }
+	        }else {
+				Methode.returnErrorAPI("erreur lors de l'enregistrement de la video");
+			}
+	        
+	        chapitre=chapitreRepository.save(chapitre);
+		}else {
+			Methode.returnErrorAPI("le chapitre indexe n'existe pas...!");
+		}
+	}
+	
+	
+	private String saveFile(Path userDirectory, MultipartFile file) {
+	    // Obtenir le nom original du fichier et remplacer les espaces
+	    String nomFichier = file.getOriginalFilename().replace(" ", "_").toLowerCase();
+	    nomFichier=nomFichier.replace(".mp4.mp4", ".mp4");
+
+	    // Définir l'emplacement du fichier
+	    Path destinationFile = userDirectory.resolve(Paths.get(nomFichier)).normalize().toAbsolutePath();
+	    
+	    try {
+	        // Copier le fichier vers le répertoire cible
+	        Files.copy(file.getInputStream(), destinationFile, StandardCopyOption.REPLACE_EXISTING);
+	        // Définir les permissions du fichier à "rw-r--r--" (644)
+	        
+	        if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+	            // Only attempt to set permissions if POSIX is supported
+	        	Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-r--r--");
+		        Files.setPosixFilePermissions(destinationFile, perms);
+	        }
+	       
+
+	        return nomFichier;
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        throw new ElearningException(new ErrorAPI("Erreur lors du téléchargement de la vidéo du cours."));
+	    }
 	}
 
 }

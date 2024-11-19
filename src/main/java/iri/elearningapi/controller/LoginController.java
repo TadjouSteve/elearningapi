@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import iri.elearningapi.service.AdminService;
 import iri.elearningapi.service.JWTService;
+import iri.elearningapi.service.ProfesseurService;
 import iri.elearningapi.service.etudiant.EtudiantService;
 import iri.elearningapi.utils.errorClass.ElearningException;
 import iri.elearningapi.utils.errorClass.ErrorAPI;
@@ -23,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class LoginController {
 	@Autowired
 	private EtudiantService etudiantService;
+	
+	@Autowired
+	private ProfesseurService professeurService;
 	
 	@Autowired
 	private  AdminService adminService;
@@ -46,7 +50,9 @@ public class LoginController {
 			return etudiantService.getLogin(userElearning);
 		}else if(adminService.getLoginAdmin(userElearning)!=null) {
 			return adminService.getLoginAdmin(userElearning);
-		}else {
+		}else if (professeurService.getLoginProf(userElearning)!=null) {
+			return professeurService.getLoginProf(userElearning);
+		} else {
 			throw new ElearningException(new ErrorAPI("Information de connexion incorrect...!",0));
 		}
 	}

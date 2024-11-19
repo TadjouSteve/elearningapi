@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "document.upload.salon.dir",
+    "type": "java.lang.String",
+    "description": "C'est ici qu'on met tout les fichier simple envoyer par les users'"
+  },
+  {
+    "name": "video.upload.salon.dir",
+    "type": "java.lang.String",
+    "description": "pour le video des candidat pour le stant du slon de l'entrepreuneur"
+  },
+  {
+    "name": "chemin.elearning.dir",
+    "type": "java.lang.String",
+    "description": "chemin d'acces au dosier racine du code front end react'"
+  },
+  {
+    "name": "document.upload.certificats.dir",
+    "type": "java.lang.String",
+    "description": "chemin vers le dossier ou seront generer les attestation, c'est egalement la que seront stocker le model des attestation"
+  }
+]}
