@@ -9,6 +9,7 @@
 		<version>2.7.1</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
+<<<<<<< HEAD
 	<groupId>com.streenge</groupId>
 	<artifactId>streenge</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -17,6 +18,16 @@
 	<description>API de Gestion Commercial</description>
 	<properties>
 		<java.version>15</java.version>
+=======
+	<groupId>iri</groupId>
+	<artifactId>elearningapi</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>elearningapi</name>
+	<packaging>war</packaging>
+	<description>Demo project for Spring Boot</description>
+	<properties>
+		<java.version>17</java.version>
+>>>>>>> f2d2e90438078dcc2ba8f428cf674c748060553e
 	</properties>
 	<dependencies>
 		<dependency>
@@ -25,13 +36,27 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+<<<<<<< HEAD
+=======
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+>>>>>>> f2d2e90438078dcc2ba8f428cf674c748060553e
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
 		<dependency>
+<<<<<<< HEAD
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
+=======
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+>>>>>>> f2d2e90438078dcc2ba8f428cf674c748060553e
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -44,6 +69,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+<<<<<<< HEAD
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
@@ -54,10 +80,34 @@
 		<dependency>
 			<groupId>org.awaitility</groupId>
 			<artifactId>awaitility</artifactId>
+=======
+    		<groupId>org.mockito</groupId>
+    		<artifactId>mockito-core</artifactId>
+    		<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.26</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+>>>>>>> f2d2e90438078dcc2ba8f428cf674c748060553e
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+<<<<<<< HEAD
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
@@ -69,6 +119,27 @@
 			compatible -->
 		</dependency>
 
+=======
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</dependency>
+		<dependency>
+    		<groupId>com.sendgrid</groupId>
+    		<artifactId>sendgrid-java</artifactId>
+    		<version>4.10.2</version>
+		</dependency>
+
+
+		<dependency>
+	        <groupId>com.itextpdf</groupId>
+	        <artifactId>itext-core</artifactId>
+	        <version>8.0.5</version>
+	        <type>pom</type>
+    	</dependency>
+>>>>>>> f2d2e90438078dcc2ba8f428cf674c748060553e
 
 	</dependencies>
 
@@ -86,7 +157,17 @@
 					</excludes>
 				</configuration>
 			</plugin>
+<<<<<<< HEAD
 		</plugins>
 	</build>
 
 </project>
+=======
+
+			
+
+		</plugins>
+	</build>
+
+</project>
+>>>>>>> f2d2e90438078dcc2ba8f428cf674c748060553e
